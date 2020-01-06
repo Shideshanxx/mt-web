@@ -21,11 +21,11 @@ passport.use(new LocalStrategy(async function(username,password,done){
   }
 }))
 
-// 序列化
+// 序列化（将信息存入session）
 passport.serializeUser(function(user,done){
   done(null,user)
 })
-// 反序列化
+// 反序列化（将信息从session中取出来）
 passport.deserializeUser(function(user,done){
   done(null,user)
 })
