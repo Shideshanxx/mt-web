@@ -125,6 +125,7 @@ export default {
         })
         if(status===200&&count>0){
           let r= pois.filter(item=>item.photos.length).map(item=>{
+            // map 返回前端需要的数据格式
             return {
               title:item.name,
               pos:item.type.split(';')[0],

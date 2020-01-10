@@ -31,7 +31,7 @@
           >
             <dt>热门搜索</dt>
             <dd
-              v-for="(item,idx) in hotPlace"
+              v-for="(item,idx) in $store.state.home.hotPlace.slice(0,5)"
               :key="idx"
             >
               <a :href="'/products?keyword='+encodeURIComponent(item.name)">{{ item.name }}</a>
@@ -50,11 +50,11 @@
           </dl>
         </div>
         <p class="suggest">
-          <a href="#">西湖</a>
-          <a href="#">西湖</a>
-          <a href="#">西湖</a>
-          <a href="#">西湖</a>
-          <a href="#">西湖</a>
+          <a
+            v-for="(item,idx) in $store.state.home.hotPlace.slice(0,5)"
+            :key="idx"
+            :href="'/products?keyword='+encodeURIComponent(item.name)"
+          >{{ item.name }}</a>
         </p>
         <ul class="nav">
           <li>
@@ -129,13 +129,15 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import { async } from 'q'
 export default {
   data() {
     return {
       search: '',
       isFocus:false,
-      hotPlace:[{name:'西湖'},{name:'黄山'}],
-      searchList:[{name:'火锅'},{name:'牛排'}]
+      hotPlace:[],
+      searchList:[]
     }
   },
   computed: {
@@ -156,9 +158,20 @@ export default {
         this.isFocus = false
       },200)
     },
-    input() {
-      console.log(this.search)
-    }
+    // input 设置300ms的延时
+    input: _.debounce(async function(){
+      let self = this;
+      let city = self.$store.state.geo.position.city.replace('市','')
+      self.searchList = []
+      let {status,data:{top}}=await self.$axios.get('/search/top',{
+        params:{
+          input:self.search,
+          city
+        }
+      })
+      // 取10条数据
+      self.searchList = top.slice(0,10)
+    },300)
   }
 }
 </script>

@@ -29,7 +29,7 @@ router.post('/signup',async (ctx)=>{
   } = ctx.request.body;
 
   if(code){
-    // 从redis中获取相应username的验证码(当nodeMailer发送验证码时会先把发送的验证码存到redis中)
+    // 从redis中获取相应username的验证码(当nodeMailer发送验证码时会先把发送的验证码和过期时间存到redis中，祥见验证码接口)
     const saveCode = await Store.hget(`nodemail:${username}`,'code')
     // 从redis中获取相应username的过期时间
     const saveExpire = await Store.hget(`nodemail:${username}`,'expire')
@@ -55,6 +55,7 @@ router.post('/signup',async (ctx)=>{
     }
   }
 
+  // 从mongodb中查询是否已经有该用户
   let user = await User.find({
     username
   })
@@ -71,8 +72,9 @@ router.post('/signup',async (ctx)=>{
     password,
     email
   })
+  // 如果入库成功
   if(newuser){
-    // 为什么要执行这一步？？？？
+    // 为什么要登陆(验证是否可以登陆成功)
     let res = await axios.post('/users/signin',{
       username,
       password
@@ -131,6 +133,7 @@ router.post('/signin',async (ctx,next)=>{
 router.post('/verify', async (ctx,next)=>{
   let username = ctx.request.body.username
   const saveExpire = await Store.hget(`nodemail:${username}`, 'expire')
+  // 如果该username已经获取过验证码 并且验证码在有效期内
   if(saveExpire && new Date().getTime() - saveExpire < 0) {
     ctx.body={
       code:-1,
@@ -168,6 +171,7 @@ router.post('/verify', async (ctx,next)=>{
       Store.hmset(`nodemail:${ko.user}`,'code',ko.code,'expire',ko.expire,'email', ko.email)
     }
   })
+  // 验证码有效时间是一分钟嘛？？？？
   ctx.body = {
     code: 0,
     msg: '验证码已发送，可能会有延时，有效期1分钟'

@@ -33,7 +33,7 @@ export default {
       // 返回一个函数，即每个的时间不同，不然返回的是一个常量
       // 过期时间一小时
       return ()=>{
-        return new Date().getTime()+60*60*1000
+        return new Date().getTime()+60*1000
       }
     }
   }

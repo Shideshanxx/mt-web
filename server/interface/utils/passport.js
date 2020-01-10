@@ -27,7 +27,7 @@ passport.serializeUser(function(user,done){
 })
 // 反序列化（将信息从session中取出来）
 passport.deserializeUser(function(user,done){
-  done(null,user)
+  return done(null,user)
 })
 
 export default passport
