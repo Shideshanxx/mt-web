@@ -28,3 +28,10 @@ const store = () => new Vuex.Store({
 })
 
 export default store
+
+
+/**
+ * 强制关闭vscode，项目依然在运行；再运行项目会提示3000端口被占用；解决方法：
+ * 在CMD中输入netstat -nao | findstr 3000，查看占用的程序
+ * 再输入 taskkill /pid 12212(12212是占用该端口号的程序) 终止该程序
+ */

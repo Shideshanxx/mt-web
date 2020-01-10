@@ -1,6 +1,6 @@
 <template>
   <div class="m-iselect">
-    <span class="name">按省份选择</span>
+    <span class="name">按省份选择:</span>
     <el-select
       v-model="pvalue"
       placeholder="省份"
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 export default {
   data() {
     return {
@@ -44,7 +45,7 @@ export default {
       cvalue: '',
       city:[],
       input: '',
-      loading: false,
+      cities: [],
       remoteValue: []
     }
   },
@@ -76,9 +77,27 @@ export default {
     }
   },
   methods: {
-    querySearch(queryString, cb) {
-      console.log(queryString, cb)
-    },
+    // 输入的时候触发，携带query和cb(回调函数)两个参数
+    querySearch:_.debounce(async function(query,cb){
+      let self = this;
+      if(self.cities.length){
+        // 在所有城市中返回所有包含query的城市
+        cb(self.cities.filter(item=>item.value.indexOf(query)>-1))
+      }else {
+        let {status,data:{city}}=await self.$axios.get('/geo/city')
+        if(status===200){
+          self.cities = city.map(item=>{
+            return {
+              value:item.name
+            }
+          })
+          console.log(self.cities)
+          cb(self.cities.filter(item=>item.value.indexOf(query)>-1))
+        }else{
+          cb([])
+        }
+      }
+    },200),
     handleSelect(item) {
       console.log(item)
     }
@@ -86,6 +105,6 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "@/assets/css/changeCity/iselect.scss";
 </style>
