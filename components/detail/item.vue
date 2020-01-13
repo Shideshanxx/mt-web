@@ -47,6 +47,7 @@ export default {
   methods: {
     createCart: async function () {
       let self = this;
+      // 实际情况，请求接口上传的id是商品的id，每个商品对应唯一的id
       let {
         status,
         data: {
@@ -64,6 +65,7 @@ export default {
         }
       })
       if(status===200&&code===0){
+        // 如果创建购物车成功才能跳转到购物车页面
         window.location.href=`/cart/?id=${id}`
       }else{
         console.log('error')

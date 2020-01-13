@@ -48,7 +48,7 @@ export default {
         city
       }
     })
-    console.log(city,keyword,pois,areas,types)
+    // console.log(city,keyword,pois,areas,types)
     if(status===200&&count>0&&status2===200){
       return {
         list: pois.filter(item=>item.photos.length).map(item=>{
