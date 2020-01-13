@@ -6,6 +6,7 @@
         v-for="item in list"
         :key="item"
       >
+        <!-- 使用锚链节做页内跳转 -->
         <a :href="'#city-'+item">{{ item }}</a>
       </dd>
     </dl>
@@ -14,7 +15,9 @@
       :key="item.title"
       class="m-categroy-section"
     >
-      <dt>{{ item.title }}</dt>
+      <dt :id="'city-'+item.title">
+        {{ item.title }}
+      </dt>
       <dd>
         <span
           v-for="c in item.city"
@@ -26,16 +29,49 @@
 </template>
 
 <script>
+import pyjs from 'js-pinyin'
 export default {
   data() {
     return {
       list: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
       block:[]
     }
+  },
+  async mounted() {
+    let self = this;
+    let blocks=[];
+    let {status,data:{city}}=await self.$axios.get('/geo/city');
+    if(status===200){
+      let p
+      let c
+      let d={}
+      city.forEach(item=>{
+        // 获取城市拼音的首字母(小写)
+        p = pyjs.getFullChars(item.name).toLocaleLowerCase().slice(0,1)
+        // 获取字符串p在index为0位置的Unicode 编码
+        c = p.charCodeAt(0)
+        // 大写A~Z的Unicode编码是65~90；小写a~z的Unicode编码是97~122
+        if(c>96&&c<123){
+          if(!d[p]){
+            d[p]=[]
+          }
+          d[p].push(item.name)
+        }
+      })
+      console.log(d)
+      for(let [k,v] of Object.entries(d)){
+        blocks.push({
+          title:k.toUpperCase(),
+          city:v
+        })
+      }
+      blocks.sort((a,b)=>a.title.charCodeAt(0)-b.title.charCodeAt(0))
+      self.block = blocks
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
+@import "@/assets/css/changeCity/categroy.scss";
 </style>
