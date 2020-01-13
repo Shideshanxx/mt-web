@@ -265,6 +265,10 @@
             min-width: 120px;
             line-height: 1.5;
             font-weight: 500;
+            cursor: pointer;
+            &:hover {
+              color: #13d1be;
+            }
           }
 
           h3 {
